@@ -52,7 +52,7 @@ pipeline {
             }
         }
         stage('Testing Job') {
-            script
+            script {
                 steps {
                     triggerTest()
                 }
