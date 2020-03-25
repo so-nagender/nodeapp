@@ -4,6 +4,13 @@ pipeline {
         repositoryName = "${params.repo}"
         branchName = "${params.branch_name}"        
     }
+    agent
+    {
+        node {
+            label 'master'
+            customWorkspace "${env.JobPath}"
+        }
+    }
     stages {
         stage('Initialization') {
             steps {
