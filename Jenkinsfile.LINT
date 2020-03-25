@@ -53,9 +53,7 @@ pipeline {
         }
         stage('Testing Job') {
             steps {
-                script {
-                    triggerTest()
-                }
+                triggerTest()
             }
         }
     }
@@ -71,7 +69,7 @@ pipeline {
 
 def triggerTest(){
     echo "trigger new Job..."
-    build job: 'oh-api/oh-api-test', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: ${branchName}],
-    [$class: 'StringParameterValue', name: 'pullId', value: ${pullId}],
-    [$class: 'StringParameterValue', name: 'repo', value: ${repositoryName}]]
+    build job: 'oh-api/oh-api-test', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: "${branchName}"],
+    [$class: 'StringParameterValue', name: 'pullId', value: "${pullId}"],
+    [$class: 'StringParameterValue', name: 'repo', value: "${repositoryName}"]]
 }
