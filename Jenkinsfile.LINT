@@ -1,0 +1,64 @@
+pipeline {
+    environment {
+        pullId = "${params.pullId}"
+        repositoryName = "${params.repo}"
+        branchName = "${params.branch_name}"        
+    }
+    agent {
+        docker {
+            image 'node:6-alpine'
+            args '-p 3000:3000 -p 5000:5000' 
+        }
+    }
+    stages {
+        stage('Initialization') {
+            steps {
+                echo "Cloning branch"
+                git branch: "${branchName}", credentialsId: '1', url: "https://github.com/nagenderRawat/${repositoryName}"            
+                script {
+                    sh "node --version"
+                    sh "npm --version"
+                    sh "npm install"
+                }            
+            }
+        }        
+        stage('TypeScript Build') { 
+            steps{
+                echo "ts build done"
+            }
+        }
+        stage('Lint Checks') {
+            parallel {
+                stage('Prettier Check') {
+                    steps{
+                      echo "prettier checks passed"
+                    }
+                }
+                stage('Lint Check') {
+                    steps{
+                      echo "lint check passed"
+                    }
+                }
+                stage('SonarQube')
+                  {                
+                    steps{
+                      echo "sonar test passed"
+                    }
+                  }
+            }
+        }
+        stage('Testing Job') {
+            steps {
+                echo "triggered tests"
+            }
+        }
+    }
+    post{
+        success {
+            echo "all checks passed successfully"
+        }
+        failure {
+            echo "failes lint job..."   
+        }
+    }
+}
