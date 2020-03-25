@@ -65,11 +65,9 @@ def buildDeploy() {
 
 def triggerChecks(){
     echo "trigger new Job..."
-    build job: 'oh-api-lint', parameters: [
-        string(name: 'branch_name', value: "master1")
-        string(name: 'pullId', value: "1234")
-        string(name: 'repo', value: "reponame")
-    ]
+    build job: 'oh-api-lint', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: 'branch_name123123'],
+    [$class: 'StringParameterValue', name: 'pullId', value: 'pullIddsdsdqwqw'],
+    [$class: 'StringParameterValue', name: 'repo', value: 'repotytyty']]
   // triggerRemoteJob mode: [$class: 'TrackProgressAwaitResult', scheduledTimeout: [timeoutStr: ''], startedTimeout: [timeoutStr: ''], timeout: [timeoutStr: '1d'], whenFailure: [$class: 'StopAsFailure'], whenScheduledTimeout: [$class: 'ContinueAsIs'], whenStartedTimeout: [$class: 'ContinueAsIs'], whenTimeout: [$class: 'ContinueAsFailure'], whenUnstable: [$class: 'ContinueAsUnstable']],
   // parameterFactories: [
   //   [$class: 'CurrentBuild', excludesStr: '', includeSensitive: false],
