@@ -1,0 +1,52 @@
+pipeline {
+    environment {
+        pullId = "${params.pullId}"
+        repositoryName = "${params.repo}"
+        branchName = "${params.branch_name}"
+    }
+    agent
+    {
+        node {
+            label 'master'
+            customWorkspace "${env.JobPath}"
+        }
+    }
+    stages {
+        stage('Initialization') {
+            steps {
+                echo "Cloning branch"
+                git branch: "${branchName}", credentialsId: '1', url: "https://github.com/scheduleonce/${repositoryName}"
+                container('nodejs-docker') {
+                    script {
+                        sh "node --version"
+                        sh "npm --version"
+                        sh "npm install"
+                    }
+                }
+            }
+        }
+        stage('Tests') {
+            steps {
+                echo "test ran successfully"
+            }
+        }
+        stage('Code Coverage') {
+            steps {
+                echo "code coverage done successfully"
+            }
+            post {
+                success {
+                    echo "post code coverage success"
+                }
+            }
+        }
+    }
+    post{
+        success {
+            echo "test passed successfully"
+        }
+        failure {
+            echo "test failed"
+        }
+    }
+}
