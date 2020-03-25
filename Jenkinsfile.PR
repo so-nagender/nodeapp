@@ -26,7 +26,7 @@ pipeline {
                     if (true) {
                         stage ('Checks Job') {
                             echo "lintjob"
-                            echo "========================== jenkins://0f512b00c7f3d4ad1076556b8a13afd2/${utils.projectName}/${repositoryName}-lint"
+                            echo "==========================hello"
                             triggerChecks()
                         }
                     }
