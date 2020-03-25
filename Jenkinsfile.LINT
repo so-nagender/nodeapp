@@ -13,6 +13,9 @@ pipeline {
     stages {
         stage('Initialization') {
             steps {
+                echo "branch name ${branchName}"
+                echo "repositoryName name ${repositoryName}"
+                echo "pullId name ${pullId}"                                
                 echo "Cloning branch"
                 git branch: "${branchName}", credentialsId: '1', url: "https://github.com/nagenderRawat/${repositoryName}"            
                 script {
