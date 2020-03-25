@@ -10,15 +10,65 @@ pipeline {
         HOME = '.'
     }
     stages {
-        stage('Build') {
+        stage('Branch Check') {
             steps {
                 sh 'npm install'
             }
         }
-        stage('Test') {
+        stage('Review Check') {
             steps {
-                sh './jenkins/scripts/test.sh'
+                echo "approved checks"
+            }
+        }
+        stage('Stage Trigger') {
+            steps {
+                script {                        
+                    if (true) {
+                        stage ('Checks Job') {
+                            echo "lintjob"
+                            echo "========================== jenkins://0f512b00c7f3d4ad1076556b8a13afd2/${utils.projectName}/${repositoryName}-lint"
+                            triggerChecks()
+                        }
+                    }
+                    buildDeploy()
+                }                                                    
             }
         }
     }
+}
+def buildDeploy() {            
+    stage('Build And Push Image'){
+        // when {
+        //     expression {
+        //         return env.useGithubAction  != 'true'
+        //     }
+        // }
+        script {
+            echo "docker build"
+            // dockerApi.buildImage()
+            // dockerApi.dockerTag(utils.targetEnvironment + '-' + prImageTag)
+        }
+    }
+    stage('Updating Image Tags'){
+        // when {
+        //     expression {
+        //         return env.useGithubAction  != 'true'
+        //     }
+        // }
+        script {
+            echo "docker tag"
+            // dockerApi.updateLatestDockertags() // Set old 'environment-latest' tagged docker image to 'environment-previous' tag & set 'environment-latest' tag to the new built image
+        }
+    }    
+}
+
+def triggerChecks(){
+    echo "trigger new Job..."
+  // triggerRemoteJob mode: [$class: 'TrackProgressAwaitResult', scheduledTimeout: [timeoutStr: ''], startedTimeout: [timeoutStr: ''], timeout: [timeoutStr: '1d'], whenFailure: [$class: 'StopAsFailure'], whenScheduledTimeout: [$class: 'ContinueAsIs'], whenStartedTimeout: [$class: 'ContinueAsIs'], whenTimeout: [$class: 'ContinueAsFailure'], whenUnstable: [$class: 'ContinueAsUnstable']],
+  // parameterFactories: [
+  //   [$class: 'CurrentBuild', excludesStr: '', includeSensitive: false],
+  //   [$class: 'SimpleString', name: 'branch_name', value: "${env.CHANGE_BRANCH}"],
+  //   [$class: 'SimpleString', name: 'repo', value: "${utils.repoName}"],
+  //   [$class: 'SimpleString', name: 'pullId', value: "${pullId}"],
+  //   ], remotePathMissing: [$class: 'ContinueAsIs'], remotePathUrl: "jenkins://0f512b00c7f3d4ad1076556b8a13afd2/${utils.projectName}/${repositoryName}-lint"
 }
