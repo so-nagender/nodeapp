@@ -1,0 +1,19 @@
+{
+  "name": "nodeapp",
+  "version": "1.0.0",
+  "description": "nodejsapp for jenkins testing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"hello test run succesfulle\" "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nagenderRawat/nodeapp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nagenderRawat/nodeapp/issues"
+  },
+  "homepage": "https://github.com/nagenderRawat/nodeapp#readme"
+}
