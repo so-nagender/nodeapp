@@ -1,52 +1,4 @@
-pipeline {
-    agent
-    {
-        node {
-            label 'master'
-            customWorkspace "${env.JobPath}"
-        }
-    }
-    environment {
-        CI = 'true'
-        HOME = '.'
-    }
-    options {
-        parallelsAlwaysFailFast()
-    }
-    stages {
-        stage('Branch Check') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        stage('Review Check') {
-            steps {
-                echo "approved checks"
-            }
-        }
-        stage('Stage Trigger') {
-            steps {
-                script {                        
-                    if (true) {                        
-                        parallel {
-                            stage('Checks Job') {
-                                echo "lintjob"
-                                echo "==========================hello"
-                                triggerChecks()
-                            }
-                            stage('Testing Job') {
-                                echo "testjob"
-                                echo "==========================hello"
-                                triggerTest()
-                            }
-                        }
-                    }
-                    buildDeploy()
-                }                                                    
-            }
-        }
-    }
-}
+
 def buildDeploy() {            
     stage('Build And Push Image'){
         // when {
@@ -86,9 +38,61 @@ def triggerChecks(){
   //   [$class: 'SimpleString', name: 'pullId', value: "${pullId}"],
   //   ], remotePathMissing: [$class: 'ContinueAsIs'], remotePathUrl: "jenkins://0f512b00c7f3d4ad1076556b8a13afd2/${utils.projectName}/${repositoryName}-lint"
 }
-def triggerTest(){
+
+def triggerTests(){
     echo "trigger new Job..."
-    build job: 'oh-api/oh-api-test', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: "${branchName}"],
-    [$class: 'StringParameterValue', name: 'pullId', value: "${pullId}"],
-    [$class: 'StringParameterValue', name: 'repo', value: "${repositoryName}"]]
+    build job: 'oh-api/oh-api-test', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: "testjenkins"],
+    [$class: 'StringParameterValue', name: 'pullId', value: "5"],
+    [$class: 'StringParameterValue', name: 'repo', value: "nodeapp"]]
+}
+
+runningChecks = [
+    "Lint Checks": {
+        triggerChecks()
+    },
+    "Test Checks": {
+        triggerTests()
+    }
+]
+
+pipeline {
+    agent
+    {
+        node {
+            label 'master'
+            customWorkspace "${env.JobPath}"
+        }
+    }
+    environment {
+        CI = 'true'
+        HOME = '.'
+    }
+    stages {
+        stage('Branch Check') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Review Check') {
+            steps {
+                echo "approved checks"
+            }
+        }
+        stage('Stage Trigger') {
+            steps {
+                script {                        
+                    if (true) {                        
+                        stage('Checks') {
+                            echo "lintjob"
+                            echo "==========================hello"
+                            script {
+                                parallel(runningChecks)
+                            }    
+                        }
+                    }
+                    buildDeploy()
+                }                                                    
+            }
+        }
+    }
 }
