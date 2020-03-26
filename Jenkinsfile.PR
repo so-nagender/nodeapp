@@ -10,6 +10,9 @@ pipeline {
         CI = 'true'
         HOME = '.'
     }
+    options {
+        parallelsAlwaysFailFast()
+    }
     stages {
         stage('Branch Check') {
             steps {
@@ -24,17 +27,19 @@ pipeline {
         stage('Stage Trigger') {
             steps {
                 script {                        
-                    if (true) {
-                    parallel (
-                        stage ('Checks Job') {
-                            echo "lintjob"
-                            echo "==========================hello"
-                            triggerChecks()
+                    if (true) {                        
+                        parallel {
+                            stage('Checks Job') {
+                                echo "lintjob"
+                                echo "==========================hello"
+                                triggerChecks()
+                            }
+                            stage('Testing Job') {
+                                echo "testjob"
+                                echo "==========================hello"
+                                triggerTest()
+                            }
                         }
-                        stage('Testing Job') {
-                            triggerTest()
-                        }, 
-                        failFast: false)
                     }
                     buildDeploy()
                 }                                                    
