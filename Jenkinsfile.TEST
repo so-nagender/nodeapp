@@ -2,7 +2,7 @@ pipeline {
     environment {
         pullId = "${params.pullId}"
         repositoryName = "${params.repo}"
-        branchName = "${params.branch_name}"
+        branchName = "${params.branch_name}"        
     }
     agent
     {
