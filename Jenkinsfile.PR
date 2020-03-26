@@ -41,12 +41,12 @@ def triggerChecks(){
 
 def triggerTests(){
     echo "trigger new Job..."
-    build job: 'oh-api/oh-api-test', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: "testjenkins"],
+    build job: 'oh-api/oh-api-testaa', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: "testjenkins"],
     [$class: 'StringParameterValue', name: 'pullId', value: "5"],
     [$class: 'StringParameterValue', name: 'repo', value: "nodeapp"]]
 }
 
-runningChecks = [
+checksJobs = [
     "Lint Checks": {
         triggerChecks()
     },
@@ -54,6 +54,7 @@ runningChecks = [
         triggerTests()
     }
 ]
+checksJobs.failFast = true
 
 pipeline {
     agent
@@ -84,9 +85,8 @@ pipeline {
                     if (true) {                        
                         stage('Checks') {
                             echo "lintjob"
-                            echo "==========================hello"
                             script {
-                                parallel(runningChecks)
+                                parallel(checksJobs)
                             }    
                         }
                     }
