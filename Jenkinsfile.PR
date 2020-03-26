@@ -10,9 +10,6 @@ pipeline {
         CI = 'true'
         HOME = '.'
     }
-    options {
-        parallelsAlwaysFailFast()
-    }
     stages {
         stage('Branch Check') {
             steps {
