@@ -15,14 +15,12 @@ pipeline {
         stage('Initialization') {
             steps {
                 echo "Cloning branch"
-                git branch: "${branchName}", credentialsId: '1', url: "https://github.com/nagenderRawat/${repositoryName}"
-                container('nodejs-docker') {
-                    script {
-                        sh "node --version"
-                        sh "npm --version"
-                        sh "npm install"
-                    }
-                }
+                git branch: "${branchName}", credentialsId: '1', url: "https://github.com/nagenderRawat/${repositoryName}"            
+                script {
+                    sh "node --version"
+                    sh "npm --version"
+                    sh "npm install"
+                }            
             }
         }
         stage('Tests') {
