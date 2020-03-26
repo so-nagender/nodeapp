@@ -15,7 +15,7 @@ pipeline {
         stage('Initialization') {
             steps {
                 echo "Cloning branch"
-                git branch: "${branchName}", credentialsId: '1', url: "https://github.com/scheduleonce/${repositoryName}"
+                git branch: "${branchName}", credentialsId: '1', url: "https://github.com/nagenderRawat/${repositoryName}"
                 container('nodejs-docker') {
                     script {
                         sh "node --version"
