@@ -1,4 +1,9 @@
 
+def isWrongPullReqUseCase = ("${env.CHANGE_BRANCH}" =~ '^(teams/).*$' && "${env.CHANGE_TARGET}" =~ 'qa')
+def shouldSkipChecks =  (("${env.CHANGE_BRANCH}" =~ 'qa' && "${env.CHANGE_TARGET}" =~ '^(teams/).*$') || ("${env.CHANGE_BRANCH}" =~ 'master' &&  "${env.CHANGE_TARGET}" =~ 'qa'))
+echo "................... source ========= ${env.CHANGE_BRANCH}"
+echo "................... target ========= ${env.CHANGE_TARGET}"
+pullId = "${env.CHANGE_ID}"
 def buildDeploy() {            
     stage('Build And Push Image'){
         // when {
@@ -28,7 +33,7 @@ def buildDeploy() {
 def triggerChecks(){
     echo "trigger new Job..."
     build job: 'oh-api/oh-api-lint', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: 'testjenkins'],
-    [$class: 'StringParameterValue', name: 'pullId', value: '5'],
+    [$class: 'StringParameterValue', name: 'pullId', value: '${pullId}'],
     [$class: 'StringParameterValue', name: 'repo', value: 'nodeapp']]
   // triggerRemoteJob mode: [$class: 'TrackProgressAwaitResult', scheduledTimeout: [timeoutStr: ''], startedTimeout: [timeoutStr: ''], timeout: [timeoutStr: '1d'], whenFailure: [$class: 'StopAsFailure'], whenScheduledTimeout: [$class: 'ContinueAsIs'], whenStartedTimeout: [$class: 'ContinueAsIs'], whenTimeout: [$class: 'ContinueAsFailure'], whenUnstable: [$class: 'ContinueAsUnstable']],
   // parameterFactories: [
@@ -41,7 +46,7 @@ def triggerChecks(){
 
 def triggerTests(){
     echo "trigger new Job..."
-    build job: 'oh-api/oh-api-testaa', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: "testjenkins"],
+    build job: 'oh-api/oh-api-test', parameters: [[$class: 'StringParameterValue', name: 'branch_name', value: "testjenkins"],
     [$class: 'StringParameterValue', name: 'pullId', value: "5"],
     [$class: 'StringParameterValue', name: 'repo', value: "nodeapp"]]
 }
@@ -71,7 +76,26 @@ pipeline {
     stages {
         stage('Branch Check') {
             steps {
-                sh 'npm install'
+                script {
+                    // if (isWrongPullReqUseCase) { 
+                        echo "wrong PR use case..........."  
+                        repository_url = scm.userRemoteConfigs[0].url
+                        repository_name = repository_url.replace("git@github.com:","").replace(".git","")
+                        echo "wrong PR use case...${repository_url}....${repository_name}...."  
+                        
+                        withCredentials([string(credentialsId: 'Token-GIT', variable: 'Token')]) {
+                            echo "GITHUB_TOKEN............. ${Token}"
+                            sh "curl -s -H \"Authorization: token ${Token}\" -X POST -d '{\"body\": \"Team branch cannot be merge to qa directly...: ${env.RUN_DISPLAY_URL}\"}' \"https://api.github.com/repos/nagenderRawat/${repository_name}/issues/${pullId}/comments\""
+                            // close the PR
+                        }
+                    // } 
+                    // else {
+                    //     GChatNotify ('STARTED', CHATROOM_URL, this)         
+                    //     writeFile file: "fingerprintfile.sh", text: "echo Built ${env.BUILD_NUMBER} of ${env.JOB_NAME}"
+                    //     // Archive the build output artifacts.
+                    //     archiveArtifacts artifacts: 'fingerprintfile.sh', fingerprint: true   
+                    // }                   
+                }
             }
         }
         stage('Review Check') {
